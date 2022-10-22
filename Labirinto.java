@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Labirinto {
     Sala [][] salas;
 
@@ -9,13 +11,18 @@ public class Labirinto {
     //oeste [  ][-1]
     //sul   [+1][  ]
     public Sala[][] labirinto1(){
+        //[0,0]	[0,1]   [0,2]
+        //[1,0]	[1,1]
+        //      [2,1]
+
         salas = new Sala[3][3];
+        boolean[] lol ={false,false,false,false}; //n,l,o,s
         salas[0][0] = new Sala(0,"",0);
-        salas[0][1] = new Sala(0,"sul",0);
+        salas[0][1] = new Sala(0,"s",0);
         salas[0][2] = new Sala(1,"",0);
 
-        salas[1][0] = new Sala(0,"leste",1);
-        salas[1][1] = new Sala(0,"",0);
+        salas[1][0] = new Sala(0,"l",1);
+        salas[1][1] = new Sala(0,"no",0);
         salas[1][2] = new Sala();
 
         salas[2][0] = new Sala();
@@ -94,7 +101,6 @@ public class Labirinto {
                     }else{
                         lol=lol+"_";
                     }
-
                 }else{
                     lol=lol+" ";
                 }

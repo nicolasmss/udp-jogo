@@ -6,7 +6,7 @@ public class Sala {
     String portas;
     int mapas;
     boolean isvalid;
-    List jogadores= new ArrayList();
+    List<String> jogadores= new ArrayList();
 
     public Sala(int chaves,String portas,int mapas){
         this.chaves=chaves;
@@ -24,6 +24,29 @@ public class Sala {
     }
     public void removeJogadores(String nome){
         jogadores.remove(nome);
+    }
+
+    @Override
+    public String toString() {
+        String lol = "[";
+        if(portas.contains("n")){
+            lol= lol + " norte";
+        }
+        if(portas.contains("l")){
+            lol= lol + " leste";
+        }
+        if(portas.contains("o")){
+            lol= lol + " oeste";
+        }
+        if(portas.contains("s")){
+            lol= lol + " sul";
+        }
+        lol = lol + " ]";
+
+        //String aqui = "banana".replace("a", "");
+
+        return "pessoas na sala: "+jogadores+"\nportas :"+lol
+        +"\nchaves: "+chaves+"\nmapas: "+ mapas;
     }
 
 }

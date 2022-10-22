@@ -5,18 +5,27 @@ public class Jogador {
     String nome;
     int linha;
     int coluna;
-    int chaves;
-    int mapas;
-    SocketAddress address;
+    int chaves=0;
+    int mapas=0;
+    InetAddress ipAddress;
+    int receivePort;
 
-    public Jogador (String nome,int linha, int coluna, SocketAddress address){
+    public Jogador (String nome,int linha, int coluna, InetAddress ipAddress, int receivePort){
         this.nome=nome;
         this.linha=linha;
         this.coluna=coluna;
-        this.address = address;
+        this.ipAddress = ipAddress;
+        this.receivePort = receivePort;
     }
 
     public String toString(){
-        return nome+linha+":"+coluna;
+        return nome+linha+":"+coluna+"--"+ipAddress+receivePort;
+    }
+
+    public InetAddress getIpAddress() {
+        return ipAddress;
+    }
+    public int getReceivePort() {
+        return receivePort;
     }
 }

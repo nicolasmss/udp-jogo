@@ -50,6 +50,9 @@ class UDPClient {
       do {
          System.out.println("escreva seu nick maximo de 8 caracteres");
          sentence = "0"+inFromUser.readLine();
+         for(int i=sentence.length();i<8 && sentence.length()>1;i++){
+            sentence = sentence+"§";
+         }
          sendData = sentence.getBytes();
          sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
          clientSocket.send(sendPacket);
@@ -59,13 +62,40 @@ class UDPClient {
       boolean fim = false;
       while(true){
          System.out.println("Menu\n" +
-                 "1 - mover");
+                 "1 - mover\n"+
+                 "2 - pegar\n"+
+                 "3 - falar\n"+
+                 "4 - cochichar");
          int escolha = in.nextInt();
 
          switch (escolha){
             case 1:
                System.out.println("mover em qual direção? (1)Norte (2)Leste (3)Oeste ou (4)Sul");
-               sentence = "1" + inFromUser.readLine();
+               sentence = escolha + inFromUser.readLine();
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 2:
+               System.out.println("Deseja pegar? (1)Chave (2)Mapa");
+               sentence = escolha + inFromUser.readLine();
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 3:
+               System.out.println("escreva sua mensagem:(max: 50 caracteres)");
+               sentence = escolha + inFromUser.readLine();
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 4:
+               System.out.println("para quem voce deseja escrever?(max: 8 caracteres)");
+               String nickname = inFromUser.readLine();
+               for(int i=nickname.length();i<8;i++){
+                  nickname = nickname+"§";
+               }
+               sentence = escolha + nickname;
+               System.out.println("escreva sua mensagem:(max: 50 caracteres)");
+               sentence = sentence + inFromUser.readLine();
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
@@ -93,8 +123,8 @@ class UDPClient {
 
 
       public void run() {
-         byte[] receiveData = new byte[1024];
          while(true){
+            byte[] receiveData = new byte[1024];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                clientSocket.receive(receivePacket);
