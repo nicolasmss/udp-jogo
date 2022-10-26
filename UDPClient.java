@@ -42,7 +42,7 @@ class UDPClient {
 
       // cria pacote com o dado, o endereco do server e porta do servidor
       //DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-      DatagramPacket sendPacket;
+      DatagramPacket sendPacket=null;
 
 
       receiver.start();
@@ -53,10 +53,13 @@ class UDPClient {
          for(int i=sentence.length();i<8 && sentence.length()>1;i++){
             sentence = sentence+"§";
          }
+         if(sentence.length()>9){
+            continue;
+         }
          sendData = sentence.getBytes();
          sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
          clientSocket.send(sendPacket);
-      }while(sentence.length()<2||sentence.length()>=9);
+      }while(sentence.length()<2||sentence.length()>9);
 
 
       boolean fim = false;
@@ -65,7 +68,8 @@ class UDPClient {
                  "1 - mover\n"+
                  "2 - pegar\n"+
                  "3 - falar\n"+
-                 "4 - cochichar");
+                 "4 - cochichar\n"+
+                 "5 - usar item");
          int escolha = in.nextInt();
 
          switch (escolha){
@@ -95,7 +99,18 @@ class UDPClient {
                }
                sentence = escolha + nickname;
                System.out.println("escreva sua mensagem:(max: 50 caracteres)");
-               sentence = sentence + inFromUser.readLine();
+               sentence = sentence +""+ inFromUser.readLine();
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 5:
+               System.out.println("que item voce deseja usar? (1)Chave (2)Mapa");
+               int escolhaItem = in.nextInt();
+               sentence = escolha + "" + escolhaItem + "";
+               if(escolhaItem==1){
+                  System.out.println("qual porta voce deseja abrir: (1)Norte (2)Leste (3)Oeste (4)Sul");
+                  sentence = escolha +""+ escolhaItem +""+ inFromUser.readLine();
+               }
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;

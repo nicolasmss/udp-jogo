@@ -45,7 +45,7 @@ public class Labirinto {
                     }
                     lol=lol+"]";
                 }
-                if (linha==2){
+                if (j==2){
                     lol=lol+"\n";
                 }else{
                     lol=lol+"\t";
