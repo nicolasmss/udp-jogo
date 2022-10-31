@@ -16,7 +16,6 @@ public class Labirinto {
         //      [2,1]
 
         salas = new Sala[3][3];
-        boolean[] lol ={false,false,false,false}; //n,l,o,s
         salas[0][0] = new Sala(0,"",0);
         salas[0][1] = new Sala(0,"s",0);
         salas[0][2] = new Sala(1,"",0);

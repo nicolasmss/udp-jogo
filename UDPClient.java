@@ -50,7 +50,7 @@ class UDPClient {
       do {
          System.out.println("escreva seu nick maximo de 8 caracteres");
          sentence = "0"+inFromUser.readLine();
-         for(int i=sentence.length();i<8 && sentence.length()>1;i++){
+         for(int i=sentence.length();i<9 && sentence.length()>1;i++){
             sentence = sentence+"§";
          }
          if(sentence.length()>9){
@@ -69,7 +69,9 @@ class UDPClient {
                  "2 - pegar\n"+
                  "3 - falar\n"+
                  "4 - cochichar\n"+
-                 "5 - usar item");
+                 "5 - usar item\n"+
+                 "6 - ver inventário\n"+
+                 "7 - largar item");
          int escolha = in.nextInt();
 
          switch (escolha){
@@ -111,6 +113,17 @@ class UDPClient {
                   System.out.println("qual porta voce deseja abrir: (1)Norte (2)Leste (3)Oeste (4)Sul");
                   sentence = escolha +""+ escolhaItem +""+ inFromUser.readLine();
                }
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 6:
+               sentence = escolha+"";
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 7:
+               System.out.println("Deseja largar? (1)Chave (2)Mapa");
+               sentence = escolha + inFromUser.readLine();
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
