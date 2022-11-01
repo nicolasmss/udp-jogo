@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 class UDPClient {
+   static boolean loop = true;
 
    static DatagramSocket clientSocket;
 
@@ -45,8 +46,8 @@ class UDPClient {
       DatagramPacket sendPacket=null;
 
 
-      receiver.start();
-
+      
+      boolean nickOK = true;
       do {
          System.out.println("escreva seu nick maximo de 8 caracteres");
          sentence = "0"+inFromUser.readLine();
@@ -59,59 +60,92 @@ class UDPClient {
          sendData = sentence.getBytes();
          sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
          clientSocket.send(sendPacket);
-      }while(sentence.length()<2||sentence.length()>9);
 
+         clientSocket.receive(sendPacket);
+         String nickteste = new String(sendPacket.getData());
+         nickteste = nickteste.substring(0,1);
+         if(nickteste.equals("1")){
+            nickOK=false;
+         }else{
+            System.out.println("Nickname já utilizado");
+         }
+
+      }while(sentence.length()<2||sentence.length()>9||nickOK);
+
+      receiver.start();
 
       boolean fim = false;
-      while(true){
+      while(loop){
+         Thread.currentThread().sleep(200);
          System.out.println("Menu\n" +
-                 "1 - mover\n"+
-                 "2 - pegar\n"+
-                 "3 - falar\n"+
-                 "4 - cochichar\n"+
-                 "5 - usar item\n"+
-                 "6 - ver inventário\n"+
-                 "7 - largar item");
+                 "1 - Mover\n"+
+                 "2 - Pegar\n"+
+                 "3 - Falar\n"+
+                 "4 - Cochichar\n"+
+                 "5 - Usar item\n"+
+                 "6 - Ver inventário\n"+
+                 "7 - Largar item\n"+
+                 "8 - Examinar item");
          int escolha = in.nextInt();
 
          switch (escolha){
             case 1:
-               System.out.println("mover em qual direção? (1)Norte (2)Leste (3)Oeste ou (4)Sul");
+               System.out.println("Mover em qual direção? (1)Norte (2)Leste (3)Oeste ou (4)Sul");
                sentence = escolha + inFromUser.readLine();
+               if(sentence.length()!=2){
+                  System.out.println("Escreva uma opção válida");
+                  continue;
+               }
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
             case 2:
-               System.out.println("Deseja pegar? (1)Chave (2)Mapa");
+               System.out.println("Deseja pegar? (1)Chave (2)Mapa (3)Tesouro");
                sentence = escolha + inFromUser.readLine();
+               if(sentence.length()!=2){
+                  System.out.println("Escreva uma opção válida");
+                  continue;
+               }
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
             case 3:
-               System.out.println("escreva sua mensagem:(max: 50 caracteres)");
+               System.out.println("Escreva sua mensagem:(max: 50 caracteres)");
                sentence = escolha + inFromUser.readLine();
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
             case 4:
-               System.out.println("para quem voce deseja escrever?(max: 8 caracteres)");
+               System.out.println("Para quem voce deseja escrever?(max: 8 caracteres)");
                String nickname = inFromUser.readLine();
+               if(nickname.length()>8||nickname.length()<1){
+                  System.out.println("Nome invalido");
+                  continue;
+               }
                for(int i=nickname.length();i<8;i++){
                   nickname = nickname+"§";
                }
                sentence = escolha + nickname;
-               System.out.println("escreva sua mensagem:(max: 50 caracteres)");
+               System.out.println("Escreva sua mensagem:(max: 50 caracteres)");
                sentence = sentence +""+ inFromUser.readLine();
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
             case 5:
-               System.out.println("que item voce deseja usar? (1)Chave (2)Mapa");
+               System.out.println("Que item voce deseja usar? (1)Chave (2)Mapa");
                int escolhaItem = in.nextInt();
                sentence = escolha + "" + escolhaItem + "";
+               if(sentence.length()!=2){
+                  System.out.println("Escreva uma opção válida");
+                  continue;
+               }
                if(escolhaItem==1){
-                  System.out.println("qual porta voce deseja abrir: (1)Norte (2)Leste (3)Oeste (4)Sul");
+                  System.out.println("Qual porta voce deseja abrir: (1)Norte (2)Leste (3)Oeste (4)Sul");
                   sentence = escolha +""+ escolhaItem +""+ inFromUser.readLine();
+                  if(sentence.length()!=3){
+                     System.out.println("Escreva uma opção válida");
+                     continue;
+                  }
                }
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
@@ -124,6 +158,20 @@ class UDPClient {
             case 7:
                System.out.println("Deseja largar? (1)Chave (2)Mapa");
                sentence = escolha + inFromUser.readLine();
+               if(sentence.length()!=2){
+                  System.out.println("Escreva uma opção válida");
+                  continue;
+               }
+               sendData = sentence.getBytes();
+               sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+               break;
+            case 8:
+               System.out.println("Deseja examinar? (1)Chave (2)Mapa");
+               sentence = escolha + inFromUser.readLine();
+               if(sentence.length()!=2){
+                  System.out.println("Escreva uma opção válida");
+                  continue;
+               }
                sendData = sentence.getBytes();
                sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
                break;
@@ -133,7 +181,11 @@ class UDPClient {
             break;
          }
          //envia o pacote
-         clientSocket.send(sendPacket);
+         if(escolha>0&&escolha<9){
+            clientSocket.send(sendPacket);
+         }else{
+            System.out.println("Escreva uma opção válida");
+         }
       }
 
 
@@ -151,7 +203,7 @@ class UDPClient {
 
 
       public void run() {
-         while(true){
+         while(loop){
             byte[] receiveData = new byte[1024];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
@@ -159,7 +211,13 @@ class UDPClient {
             } catch (IOException e) {
                throw new RuntimeException(e);
             }
-            System.out.println(new String(receivePacket.getData()));
+            String str = new String (receivePacket.getData()).trim();
+            if(str.contains("FIM159753")){
+               System.out.println(str.substring(0, str.length()-9));
+               loop=false;
+            }else{
+               System.out.println(new String(receivePacket.getData()));
+            }
          }
       }
    }

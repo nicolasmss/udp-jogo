@@ -29,7 +29,8 @@ class UDPServer {
       // labirinto
       labirinto.salas = labirinto.labirinto1();
 
-      while (true) {
+      boolean fimdejogo =true;
+      while (fimdejogo) {
          byte[] receiveData = new byte[1024];
          // declara o pacote a ser recebido
          DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -64,10 +65,24 @@ class UDPServer {
 
          // int direcao;
          // int pegaroq;
+         boolean moveuse = false;
 
          switch (escolha) {
             case 0:
+               moveuse=true;
+               boolean repet=false;
                String nome = sentence.substring(1, 9).replace("§", "");
+               for (Jogador j : listaJogadores) {
+                  if(j.nome.equals(nome)){
+                     serverSocket.send(new DatagramPacket("0".getBytes(), 1, IPAddress, receivePort));
+                     repet=true;
+                     break;
+                  }
+               }
+               if(repet){
+                  continue;
+               }
+               serverSocket.send(new DatagramPacket("1".getBytes(), 1, IPAddress, receivePort));
                listaJogadores.add(new Jogador(nome, iniL, iniC, IPAddress, receivePort));
                labirinto.salas[iniC][iniL].addJogadores(nome);
                atual = listaJogadores.get(listaJogadores.size() - 1);
@@ -84,6 +99,7 @@ class UDPServer {
                      } else if (labirinto.salas[atual.linha][atual.coluna].portas.contains("n")) {
                         System.out.println("porta fechada ai meu patrão");
                      } else {
+                        moveuse = true;
                         labirinto.salas[atual.linha][atual.coluna].removeJogadores(atual.nome);
                         if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() >= 1) {
                            paraTodosSala(
@@ -102,6 +118,7 @@ class UDPServer {
                      } else if (labirinto.salas[atual.linha][atual.coluna].portas.contains("l")) {
                         System.out.println("porta fechada ai meu patrão");
                      } else {
+                        moveuse = true;
                         labirinto.salas[atual.linha][atual.coluna].removeJogadores(atual.nome);
                         if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() >= 1) {
                            paraTodosSala(
@@ -120,6 +137,7 @@ class UDPServer {
                      } else if (labirinto.salas[atual.linha][atual.coluna].portas.contains("o")) {
                         System.out.println("porta fechada ai meu patrão");
                      } else {
+                        moveuse = true;
                         labirinto.salas[atual.linha][atual.coluna].removeJogadores(atual.nome);
                         if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() >= 1) {
                            paraTodosSala(
@@ -138,6 +156,7 @@ class UDPServer {
                      } else if (labirinto.salas[atual.linha][atual.coluna].portas.contains("s")) {
                         System.out.println("porta fechada ai meu patrão");
                      } else {
+                        moveuse = true;
                         labirinto.salas[atual.linha][atual.coluna].removeJogadores(atual.nome);
                         if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() >= 1) {
                            paraTodosSala(
@@ -164,6 +183,9 @@ class UDPServer {
                      } else if (pegaroq == 2) {
                         paraTodosSala(atual.nome + " pegou um mapa\n" + "mapas restantes: "
                               + labirinto.salas[atual.linha][atual.coluna].mapas, atual, serverSocket);
+                     } else if(pegaroq == 3){
+                        paraTodos(atual.nome+" pegou o tesouro e ganhou o jogoFIM159753", serverSocket);
+                        fimdejogo = false;
                      }
                   }
                } else {
@@ -192,6 +214,23 @@ class UDPServer {
                }else{
                   serverSocket.send(new DatagramPacket("falha ao largar o item".getBytes(), 22, IPAddress, receivePort));
                }
+            case 8:
+            int examoq = parseInt(sentence.substring(1, 2));
+            if(examoq==1){
+               if(atual.chaves>0){
+                  serverSocket.send(new DatagramPacket("A chave serve para abrir qualquer porta mas ela se gasta ao usar".getBytes(), 64, IPAddress, receivePort));
+               }else{
+                  serverSocket.send(new DatagramPacket("não tem como examinar o item que voce não possui".getBytes(), 48, IPAddress, receivePort));
+               }
+            }else if(examoq==2){
+               if(atual.mapas>0){
+                  serverSocket.send(new DatagramPacket("O mapa mostra todas as salas do labirinto. Todas as portas vizinhas tem caminhos entre si".getBytes(), 89, IPAddress, receivePort));
+               }else{
+                  serverSocket.send(new DatagramPacket("não tem como examinar o item que voce não possui".getBytes(), 48, IPAddress, receivePort));
+               }
+            }else{
+               serverSocket.send(new DatagramPacket("escolha invalida".getBytes(), 16, IPAddress, receivePort));
+            }
          }
 
          System.out.println(atual);
@@ -201,13 +240,23 @@ class UDPServer {
          String resposta;
          Jogador alvo;
          switch (escolha) {
-            case 0, 1:
-               resposta = labirinto.show(atual.linha, atual.coluna) + labirinto.salas[atual.linha][atual.coluna];
-               serverSocket.send(new DatagramPacket(resposta.getBytes(), resposta.length(), IPAddress, receivePort));
-               if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() > 1) {
-                  paraTodosSala(atual.nome + " chegou na sala\n" + labirinto.salas[atual.linha][atual.coluna].jogadores,
+            case 0: 
+            case 1:
+               if(moveuse){
+                  resposta = labirinto.show(atual.linha, atual.coluna) + labirinto.salas[atual.linha][atual.coluna];
+                  serverSocket.send(new DatagramPacket(resposta.getBytes(), resposta.length(), IPAddress, receivePort));
+
+                  if(labirinto.salas[atual.linha][atual.coluna].tesouro){
+                     serverSocket.send(new DatagramPacket("O TESOURO ESTA AQUI".getBytes(), 19, IPAddress, receivePort));
+                  }
+                  if (labirinto.salas[atual.linha][atual.coluna].jogadores.size() > 1) {
+                     paraTodosSala(atual.nome + " chegou na sala\n" + labirinto.salas[atual.linha][atual.coluna].jogadores,
                         atual, serverSocket);
+                  }
+               }else{
+                  serverSocket.send(new DatagramPacket("movimento invalido".getBytes(), 18, IPAddress, receivePort));
                }
+               
                break;
             case 3:
                resposta = sentence.substring(1, 51);
@@ -264,6 +313,10 @@ class UDPServer {
             atual.mapas++;
             return true;
          }
+      } else if(objeto == 3){
+         if (sala.tesouro) {
+            return true;
+         }
       }
       return false;
    }
@@ -307,6 +360,14 @@ class UDPServer {
             serverSocket.send(
                   new DatagramPacket(resposta.getBytes(), resposta.length(), j.getIpAddress(), j.getReceivePort()));
          }
+      }
+   }
+
+   public static void paraTodos(String resposta, DatagramSocket serverSocket)
+         throws IOException {
+      for (Jogador j : listaJogadores) {
+         serverSocket.send(
+            new DatagramPacket(resposta.getBytes(), resposta.length(), j.getIpAddress(), j.getReceivePort()));
       }
    }
 

@@ -7,6 +7,7 @@ public class Sala {
     int mapas;
     boolean isvalid;
     List<String> jogadores= new ArrayList();
+    boolean tesouro=false;;
 
     public Sala(int chaves,String portas,int mapas){
         this.chaves=chaves;

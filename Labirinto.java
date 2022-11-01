@@ -28,6 +28,8 @@ public class Labirinto {
         salas[2][1] = new Sala(0,"",0);
         salas[2][2] = new Sala();
 
+        salas[2][1].tesouro=true;
+
         return salas;
     }
 
