@@ -214,6 +214,7 @@ class UDPServer {
                }else{
                   serverSocket.send(new DatagramPacket("falha ao largar o item".getBytes(), 22, IPAddress, receivePort));
                }
+               break;
             case 8:
             int examoq = parseInt(sentence.substring(1, 2));
             if(examoq==1){
